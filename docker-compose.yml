@@ -1,0 +1,61 @@
+# docker-compose.yml — raíz del monorepo pixelforge.
+# Levanta Postgres + backend Spring Boot + frontend (nginx sirviendo React).
+#
+# Uso:
+#   docker compose up --build
+#
+# Frontend: http://localhost:5173
+# Backend:  http://localhost:8080/api/health
+# Postgres: localhost:5432  (pixelforge / pixelforge)
+
+services:
+  db:
+    image: postgres:14-alpine
+    container_name: pixelforge-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pixelforge
+      POSTGRES_USER: pixelforge
+      POSTGRES_PASSWORD: pixelforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # pg_isready devuelve 0 cuando Postgres acepta conexiones.
+      # El backend usa esto para esperar a que la DB esté lista de verdad.
+      test: ["CMD-SHELL", "pg_isready -U pixelforge -d pixelforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: pixelforge-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Dentro de la red de Compose, "db" es el hostname del servicio Postgres.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pixelforge
+      SPRING_DATASOURCE_USERNAME: pixelforge
+      SPRING_DATASOURCE_PASSWORD: pixelforge
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: pixelforge-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # Mapeamos el 80 interno de nginx al 5173 del host para conservar el
+      # puerto típico que asocias a Vite, aunque en realidad sirva el build.
+      - "5173:80"
+
+volumes:
+  db-data:
