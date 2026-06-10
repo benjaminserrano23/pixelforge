@@ -10,6 +10,9 @@ documentos cubren la implementación y operación.
   - [01-architecture.md](01-architecture.md) — visión arquitectónica del corte inicial: qué pieza vive dónde y por qué.
   - [02-run-guide.md](02-run-guide.md) — cómo arrancar el monorepo en Windows 11 (Docker y modo desarrollo).
 
+- **Transversal**
+  - [03-workflow.md](03-workflow.md) — estrategia de ramas (main/develop/feature), verificación pre-producción y deploy con Vercel/Render.
+
 ## Por venir (a medida que avancemos)
 
 - Paso 2 — Auth con JWT y roles (`PLAYER` / `DEVELOPER`).

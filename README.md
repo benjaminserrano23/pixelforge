@@ -80,6 +80,16 @@ fundamental:
 - Configuración del backend con `${ENV:default}`: el mismo jar corre con
   `localhost` en local y `db` dentro de Compose, sin recompilar.
 
+## Flujo de trabajo
+
+- Ramas: `main` (producción), `develop` (integración), `feature/<nombre>` por feature.
+- Cada feature se mezcla a `develop` vía Pull Request. Cuando `develop` está estable y verificado, se promueve a `main` vía PR.
+- Detalles, comandos paso a paso y reglas de protección en [`docs/03-workflow.md`](docs/03-workflow.md).
+
+## Repositorio remoto
+
+<https://github.com/benjaminserrano23/pixelforge>
+
 ## Trabajo futuro (fuera del MVP)
 
 Documentado en el spec, sección 1: pasarela de pago Flow, chat/amigos, juegos
