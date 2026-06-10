@@ -6,8 +6,6 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 **Stack:** React 19 + TypeScript + Vite + Tailwind v4 · Spring Boot 3
 (JDK 17, Maven) · PostgreSQL 14 · JWT · Docker.
 
-> Spec funcional completo en [`PixelForge_Slice_Spec_1.md`](PixelForge_Slice_Spec_1.md).
-
 ## Estado del roadmap
 
 | Paso | Descripción | Estado |
@@ -48,7 +46,6 @@ pixelforge/
 │   ├── 01-architecture.md
 │   └── 02-run-guide.md
 ├── docker-compose.yml             # db + backend + frontend
-├── PixelForge_Slice_Spec_1.md     # spec funcional
 └── README.md
 ```
 
@@ -92,6 +89,13 @@ fundamental:
 
 ## Trabajo futuro (fuera del MVP)
 
-Documentado en el spec, sección 1: pasarela de pago Flow, chat/amigos, juegos
-embebidos en Phaser, ranking. Mostrar que se sabe recortar alcance es criterio
-de ingeniería explícito del proyecto.
+Conscientemente recortado del alcance inicial:
+
+- Pasarela de pago real (las adquisiciones del MVP son mock).
+- Chat entre usuarios y sistema de amigos.
+- Juegos embebidos jugables en el navegador (vía Phaser u otro engine).
+- Ranking / leaderboard cross-juegos.
+
+Recortar alcance temprano es una decisión de ingeniería: priorizar que el
+corte vertical (publicar → descubrir → adquirir → estadísticas) funcione
+bien antes que cubrir todas las features posibles a medias.
