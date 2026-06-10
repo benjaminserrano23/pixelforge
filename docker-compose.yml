@@ -42,6 +42,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pixelforge
       SPRING_DATASOURCE_USERNAME: pixelforge
       SPRING_DATASOURCE_PASSWORD: pixelforge
+      # Para dev usamos un secreto fijo; en prod inyectar desde el panel del proveedor.
+      JWT_SECRET: dev-only-secret-change-me-in-production-please-pixelforge
+      JWT_EXPIRATION_MS: 900000
     ports:
       - "8080:8080"
 
