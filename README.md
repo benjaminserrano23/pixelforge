@@ -22,30 +22,29 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 
 ```
 pixelforge/
-├── backend/                       # Spring Boot 3, Maven, JDK 17
-│   ├── pom.xml
-│   ├── Dockerfile
-│   └── src/main/
-│       ├── java/com/pixelforge/app/
-│       │   ├── PixelforgeApplication.java
-│       │   ├── config/SecurityConfig.java
-│       │   └── health/HealthController.java
-│       └── resources/application.properties
-├── frontend/                      # React 19 + Vite + TS + Tailwind v4
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── nginx.conf
-│   ├── Dockerfile
-│   ├── index.html
+├── backend/                              # Spring Boot 3, Maven, JDK 17
+│   ├── pom.xml                           # jjwt, postgres, spring-boot starters
+│   ├── Dockerfile                        # multi-stage: maven build -> jre runtime
 │   └── src/
-│       ├── main.tsx
-│       ├── App.tsx
-│       └── index.css
-├── docs/                          # documentación interna
-│   ├── 01-architecture.md
-│   └── 02-run-guide.md
-├── docker-compose.yml             # db + backend + frontend
+│       ├── main/java/com/pixelforge/app/
+│       │   ├── PixelforgeApplication.java
+│       │   ├── auth/                     # AuthController, AuthService, dto/, jwt/, exception/
+│       │   ├── config/                   # SecurityConfig (filtro JWT integrado)
+│       │   ├── health/                   # HealthController (/api/health)
+│       │   └── user/                     # User entity, UserRole, UserRepository
+│       ├── main/resources/application.properties
+│       └── test/java/com/pixelforge/app/ # AuthServiceTest, AuthControllerTest, UserRepositoryTest
+├── frontend/                             # React 19 + Vite + TS + Tailwind v4
+│   ├── package.json, vite.config.ts, tsconfig.json
+│   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
+│   ├── index.html
+│   └── src/                              # main.tsx, App.tsx, index.css
+├── docs/                                 # documentación interna
+│   ├── 01-architecture.md                # decisiones del Paso 1
+│   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
+│   ├── 03-workflow.md                    # ramas, verificación, deploy
+│   └── 04-auth.md                        # decisiones del Paso 2
+├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```
 
@@ -71,9 +70,10 @@ fundamental:
   de dependencias y su `Dockerfile`.
 - El frontend nunca conoce la URL del backend: hace `fetch('/api/health')`
   y un proxy (Vite en dev, nginx en prod) lo enruta. No usamos CORS.
-- Spring Security activo desde el primer commit; en este paso permite todo
-  `/api/**` para no bloquear el smoke test. En el Paso 2 ese mismo archivo
-  pasa a exigir JWT y validar roles.
+- Spring Security activo desde el primer commit. En el Paso 1 abría `/api/**`
+  para no bloquear el smoke test; en el Paso 2 ese mismo `SecurityConfig` se
+  reescribió para exigir JWT en todas las rutas salvo `/api/health` y
+  `/api/auth/{register,login}`, y validar roles `PLAYER` / `DEVELOPER`.
 - Configuración del backend con `${ENV:default}`: el mismo jar corre con
   `localhost` en local y `db` dentro de Compose, sin recompilar.
 

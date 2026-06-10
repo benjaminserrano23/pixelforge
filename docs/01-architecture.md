@@ -71,11 +71,11 @@ con autoconfiguración que se activa al sumar la dependencia más tarde:
 
 - `requestMatchers("/api/**").permitAll()` — todo abierto por ahora.
 - `csrf().disable()` — la API es stateless, no usamos sesiones con cookies.
-- `sessionCreationPolicy(STATELESS)` — anticipa el modelo JWT del Paso 2.
+- `sessionCreationPolicy(STATELESS)` — anticipa el modelo JWT (Paso 2).
 
-Cuando llegue auth (Paso 2), este es el **único archivo** que se toca para
-exigir token y verificar roles. Aislar la decisión de seguridad en un solo
-sitio paga dividendos.
+Cuando llegó auth en el Paso 2, este fue efectivamente el **único archivo**
+que se reescribió para exigir token y validar roles. Aislar la decisión de
+seguridad en un solo sitio pagó dividendos.
 
 ### 4. Configuración con env-vars + defaults
 
