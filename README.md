@@ -13,8 +13,8 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 | Paso | Descripción | Estado |
 |------|-------------|--------|
 | 1 | Scaffold monorepo + `docker-compose` + endpoint `/api/health` | ✅ verificado 2026-06-10 |
-| 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ⏳ siguiente |
-| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | — |
+| 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ✅ implementado 2026-06-10 (15 tests verde) |
+| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ⏳ siguiente |
 | 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | — |
 | 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | — |
 | 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | — |
