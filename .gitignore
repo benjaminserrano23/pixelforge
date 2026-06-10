@@ -19,3 +19,6 @@ Thumbs.db
 .env
 .env.local
 *.local
+
+# Archivos de trabajo locales (no van al remoto)
+PixelForge_Slice_Spec_1.md
