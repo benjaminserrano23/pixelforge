@@ -6,15 +6,13 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 **Stack:** React 19 + TypeScript + Vite + Tailwind v4 · Spring Boot 3
 (JDK 17, Maven) · PostgreSQL 14 · JWT · Docker.
 
-> Spec funcional completo en [`PixelForge_Slice_Spec_1.md`](PixelForge_Slice_Spec_1.md).
-
 ## Estado del roadmap
 
 | Paso | Descripción | Estado |
 |------|-------------|--------|
 | 1 | Scaffold monorepo + `docker-compose` + endpoint `/api/health` | ✅ verificado 2026-06-10 |
-| 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ⏳ siguiente |
-| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | — |
+| 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ✅ implementado 2026-06-10 (15 tests verde) |
+| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ⏳ siguiente |
 | 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | — |
 | 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | — |
 | 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | — |
@@ -24,31 +22,29 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 
 ```
 pixelforge/
-├── backend/                       # Spring Boot 3, Maven, JDK 17
-│   ├── pom.xml
-│   ├── Dockerfile
-│   └── src/main/
-│       ├── java/com/pixelforge/app/
-│       │   ├── PixelforgeApplication.java
-│       │   ├── config/SecurityConfig.java
-│       │   └── health/HealthController.java
-│       └── resources/application.properties
-├── frontend/                      # React 19 + Vite + TS + Tailwind v4
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── nginx.conf
-│   ├── Dockerfile
-│   ├── index.html
+├── backend/                              # Spring Boot 3, Maven, JDK 17
+│   ├── pom.xml                           # jjwt, postgres, spring-boot starters
+│   ├── Dockerfile                        # multi-stage: maven build -> jre runtime
 │   └── src/
-│       ├── main.tsx
-│       ├── App.tsx
-│       └── index.css
-├── docs/                          # documentación interna
-│   ├── 01-architecture.md
-│   └── 02-run-guide.md
-├── docker-compose.yml             # db + backend + frontend
-├── PixelForge_Slice_Spec_1.md     # spec funcional
+│       ├── main/java/com/pixelforge/app/
+│       │   ├── PixelforgeApplication.java
+│       │   ├── auth/                     # AuthController, AuthService, dto/, jwt/, exception/
+│       │   ├── config/                   # SecurityConfig (filtro JWT integrado)
+│       │   ├── health/                   # HealthController (/api/health)
+│       │   └── user/                     # User entity, UserRole, UserRepository
+│       ├── main/resources/application.properties
+│       └── test/java/com/pixelforge/app/ # AuthServiceTest, AuthControllerTest, UserRepositoryTest
+├── frontend/                             # React 19 + Vite + TS + Tailwind v4
+│   ├── package.json, vite.config.ts, tsconfig.json
+│   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
+│   ├── index.html
+│   └── src/                              # main.tsx, App.tsx, index.css
+├── docs/                                 # documentación interna
+│   ├── 01-architecture.md                # decisiones del Paso 1
+│   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
+│   ├── 03-workflow.md                    # ramas, verificación, deploy
+│   └── 04-auth.md                        # decisiones del Paso 2
+├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```
 
@@ -74,9 +70,10 @@ fundamental:
   de dependencias y su `Dockerfile`.
 - El frontend nunca conoce la URL del backend: hace `fetch('/api/health')`
   y un proxy (Vite en dev, nginx en prod) lo enruta. No usamos CORS.
-- Spring Security activo desde el primer commit; en este paso permite todo
-  `/api/**` para no bloquear el smoke test. En el Paso 2 ese mismo archivo
-  pasa a exigir JWT y validar roles.
+- Spring Security activo desde el primer commit. En el Paso 1 abría `/api/**`
+  para no bloquear el smoke test; en el Paso 2 ese mismo `SecurityConfig` se
+  reescribió para exigir JWT en todas las rutas salvo `/api/health` y
+  `/api/auth/{register,login}`, y validar roles `PLAYER` / `DEVELOPER`.
 - Configuración del backend con `${ENV:default}`: el mismo jar corre con
   `localhost` en local y `db` dentro de Compose, sin recompilar.
 
@@ -92,6 +89,13 @@ fundamental:
 
 ## Trabajo futuro (fuera del MVP)
 
-Documentado en el spec, sección 1: pasarela de pago Flow, chat/amigos, juegos
-embebidos en Phaser, ranking. Mostrar que se sabe recortar alcance es criterio
-de ingeniería explícito del proyecto.
+Conscientemente recortado del alcance inicial:
+
+- Pasarela de pago real (las adquisiciones del MVP son mock).
+- Chat entre usuarios y sistema de amigos.
+- Juegos embebidos jugables en el navegador (vía Phaser u otro engine).
+- Ranking / leaderboard cross-juegos.
+
+Recortar alcance temprano es una decisión de ingeniería: priorizar que el
+corte vertical (publicar → descubrir → adquirir → estadísticas) funcione
+bien antes que cubrir todas las features posibles a medias.

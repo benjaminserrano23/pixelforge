@@ -1,31 +1,61 @@
 package com.pixelforge.app.config;
 
+import com.pixelforge.app.auth.jwt.JwtAuthenticationEntryPoint;
+import com.pixelforge.app.auth.jwt.JwtAuthenticationFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
+
     /**
-     * Configuración mínima para que la API sea accesible sin login
-     * mientras montamos el esqueleto. Cuando agreguemos autenticación
-     * real, este es el único punto a tocar.
+     * BCrypt: hash lento con salt, estándar en Spring Security.
+     * El cost por defecto (10) es razonable para 2026.
      */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF está pensado para sesiones de navegador con cookies.
-                // Nuestra API es stateless, así que se desactiva.
                 .csrf(csrf -> csrf.disable())
-                // Sin sesión HTTP: cada request se autentica por sí mismo (cuando toque).
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 401 con body JSON en vez del 403 por defecto cuando falta auth.
+                .exceptionHandling(eh -> eh.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
+                        // Rutas públicas:
+                        .requestMatchers("/api/health").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        // Resto de /api/** requiere JWT válido.
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
-                );
+                )
+                // Insertamos nuestro filtro JWT antes del filtro de username/password
+                // estándar, para que el SecurityContext ya esté poblado cuando llegue
+                // la cadena de autorización.
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }

@@ -5,9 +5,9 @@
 > frontend lo renderiza en pantalla.
 
 Este documento explica las decisiones arquitectónicas detrás del corte inicial
-del monorepo (Paso 1 del roadmap del spec). El objetivo del paso no es entregar
-una feature funcional, sino dejar montados los tres servicios y la cadena de
-comunicación que el resto del proyecto va a usar.
+del monorepo (Paso 1 del roadmap del [README](../README.md)). El objetivo del
+paso no es entregar una feature funcional, sino dejar montados los tres
+servicios y la cadena de comunicación que el resto del proyecto va a usar.
 
 ## Topología
 
@@ -63,17 +63,19 @@ DTOs dentro de su propio paquete. Acopla por dominio, no por tecnología.
 
 ### 3. Spring Security activo desde el primer commit
 
-El spec exige Spring Security como dependencia (línea 4). En vez de añadirla
-"a futuro", la dejé desde el Paso 1 con una configuración mínima en
-[`SecurityConfig.java`](../backend/src/main/java/com/pixelforge/app/config/SecurityConfig.java):
+Spring Security se incluye como dependencia desde el primer commit aunque el
+Paso 1 no necesite autenticación. Lo dejé activo con una configuración mínima
+en [`SecurityConfig.java`](../backend/src/main/java/com/pixelforge/app/config/SecurityConfig.java)
+para que el Paso 2 (JWT) tenga un único archivo que reescribir, sin pelearse
+con autoconfiguración que se activa al sumar la dependencia más tarde:
 
 - `requestMatchers("/api/**").permitAll()` — todo abierto por ahora.
 - `csrf().disable()` — la API es stateless, no usamos sesiones con cookies.
-- `sessionCreationPolicy(STATELESS)` — anticipa el modelo JWT del Paso 2.
+- `sessionCreationPolicy(STATELESS)` — anticipa el modelo JWT (Paso 2).
 
-Cuando llegue auth (Paso 2), este es el **único archivo** que se toca para
-exigir token y verificar roles. Aislar la decisión de seguridad en un solo
-sitio paga dividendos.
+Cuando llegó auth en el Paso 2, este fue efectivamente el **único archivo**
+que se reescribió para exigir token y validar roles. Aislar la decisión de
+seguridad en un solo sitio pagó dividendos.
 
 ### 4. Configuración con env-vars + defaults
 
