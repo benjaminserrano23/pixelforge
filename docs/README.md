@@ -1,8 +1,8 @@
 # Documentación de PixelForge
 
-Índice de docs internos del monorepo. La especificación funcional vive en
-[`../PixelForge_Slice_Spec_1.md`](../PixelForge_Slice_Spec_1.md); estos
-documentos cubren la implementación y operación.
+Índice de docs internos del monorepo. Cubren las decisiones de implementación
+y la operación día a día. El roadmap a alto nivel vive en el
+[README raíz](../README.md).
 
 ## Por paso del roadmap
 
