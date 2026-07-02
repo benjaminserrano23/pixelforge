@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 
+// Página de diagnóstico (antes era todo el App.tsx del Paso 1). Se conserva
+// en /health porque el smoke test de docs/02-run-guide.md la usa para
+// verificar la conexión frontend ↔ backend.
+
 // Forma de la respuesta del backend (GET /api/health).
-// Tiparlo aquí da autocompletado en el resto del componente y
-// hace explícito el contrato con el backend.
 type Health = {
   status: string
   service: string
@@ -14,7 +16,7 @@ type FetchState =
   | { kind: 'ok'; data: Health }
   | { kind: 'error'; message: string }
 
-export default function App() {
+export default function HealthPage() {
   const [state, setState] = useState<FetchState>({ kind: 'loading' })
 
   useEffect(() => {
@@ -39,16 +41,14 @@ export default function App() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
-      <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
-        <h1 className="text-2xl font-bold mb-1">pixelforge</h1>
-        <p className="text-slate-400 text-sm mb-6">
-          Verificación de conexión frontend ↔ backend
-        </p>
+    <section className="w-full max-w-md mx-auto mt-12 rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
+      <h1 className="text-2xl font-bold mb-1">Diagnóstico</h1>
+      <p className="text-slate-400 text-sm mb-6">
+        Verificación de conexión frontend ↔ backend
+      </p>
 
-        <StatusCard state={state} />
-      </section>
-    </main>
+      <StatusCard state={state} />
+    </section>
   )
 }
 
@@ -63,24 +63,29 @@ function StatusCard({ state }: { state: FetchState }) {
 
   if (state.kind === 'error') {
     return (
-      <div className="rounded-xl bg-red-950/60 border border-red-800 p-4">
-        <p className="text-red-300 font-semibold">Backend no responde</p>
-        <p className="text-red-400/80 text-sm mt-1">{state.message}</p>
+      <div className="rounded-xl bg-red-950/50 border border-red-900 p-4">
+        <p className="font-semibold text-red-400 mb-1">Backend no disponible</p>
+        <p className="text-sm text-red-300/80">{state.message}</p>
       </div>
     )
   }
 
-  const { data } = state
   return (
-    <div className="rounded-xl bg-emerald-950/60 border border-emerald-800 p-4">
-      <p className="text-emerald-300 font-semibold">
-        Estado: {data.status}
-      </p>
-      <dl className="mt-3 text-sm grid grid-cols-[6rem_1fr] gap-y-1 text-emerald-200/90">
-        <dt className="text-emerald-400/70">Servicio</dt>
-        <dd>{data.service}</dd>
-        <dt className="text-emerald-400/70">Timestamp</dt>
-        <dd className="font-mono text-xs">{data.timestamp}</dd>
+    <div className="rounded-xl bg-emerald-950/50 border border-emerald-900 p-4">
+      <p className="font-semibold text-emerald-400 mb-2">Conectado</p>
+      <dl className="text-sm space-y-1">
+        <div className="flex justify-between">
+          <dt className="text-slate-400">Servicio</dt>
+          <dd>{state.data.service}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt className="text-slate-400">Estado</dt>
+          <dd>{state.data.status}</dd>
+        </div>
+        <div className="flex justify-between">
+          <dt className="text-slate-400">Timestamp</dt>
+          <dd className="text-slate-300">{state.data.timestamp}</dd>
+        </div>
       </dl>
     </div>
   )
