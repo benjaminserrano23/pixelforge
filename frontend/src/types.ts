@@ -19,8 +19,34 @@ export type AuthResponse = {
 }
 
 // Formato de error del GlobalExceptionHandler del backend:
-// { error: "validation_failed", fields: {campo: mensaje} } o { error: "invalid_credentials" }.
+// { error: "validation_failed", fields: {...} }, { error: "invalid_cover", message: "..." },
+// o simplemente { error: "invalid_credentials" }.
 export type ApiErrorBody = {
   error: string
   fields?: Record<string, string>
+  message?: string
+}
+
+export type GameStatus = 'DRAFT' | 'PUBLISHED'
+
+export type Game = {
+  id: number
+  title: string
+  description: string
+  genre: string
+  price: number
+  coverImageUrl: string | null
+  status: GameStatus
+  developerId: number
+  createdAt: string
+  updatedAt: string
+}
+
+// Espejo de PageResponse<T> del backend (GameController: catalog, mine).
+export type Page<T> = {
+  items: T[]
+  page: number
+  size: number
+  totalItems: number
+  totalPages: number
 }

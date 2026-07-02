@@ -114,6 +114,34 @@ class GameServiceTest {
     }
 
     @Test
+    void findOwned_returns_draft_game_for_its_developer() {
+        // Bug encontrado en verificación E2E: el formulario de edición del
+        // frontend usaba el endpoint público (findPublishedById) y recibía
+        // 404 al editar un juego recién creado, porque nace DRAFT.
+        Game draft = sampleGame(developer());
+        when(userRepository.findByEmail("dev@example.com")).thenReturn(Optional.of(developer()));
+        when(gameRepository.findById(10L)).thenReturn(Optional.of(draft));
+
+        GameResponse res = gameService.findOwned("dev@example.com", 10L);
+
+        assertThat(res.status()).isEqualTo(GameStatus.DRAFT);
+    }
+
+    @Test
+    void findOwned_throws_when_caller_is_not_the_owner() {
+        Game draft = sampleGame(developer());
+        User someoneElse = new User();
+        someoneElse.setId(2L);
+        someoneElse.setEmail("other@example.com");
+        someoneElse.setRole(UserRole.DEVELOPER);
+        when(userRepository.findByEmail("other@example.com")).thenReturn(Optional.of(someoneElse));
+        when(gameRepository.findById(10L)).thenReturn(Optional.of(draft));
+
+        assertThatThrownBy(() -> gameService.findOwned("other@example.com", 10L))
+                .isInstanceOf(NotGameOwnerException.class);
+    }
+
+    @Test
     void findPublishedById_throws_not_found_for_draft_game() {
         Game draft = sampleGame(developer());
         draft.setStatus(GameStatus.DRAFT);

@@ -50,6 +50,14 @@ public class GameController {
         return gameService.findMine(authentication.getName(), pageable);
     }
 
+    // El formulario de edición necesita ver el juego sin importar su status
+    // (uno recién creado es DRAFT); "/{id}" de arriba es el catálogo público,
+    // que solo expone PUBLISHED.
+    @GetMapping("/mine/{id}")
+    public GameResponse mineDetail(Authentication authentication, @PathVariable Long id) {
+        return gameService.findOwned(authentication.getName(), id);
+    }
+
     @PostMapping
     public GameResponse create(Authentication authentication, @Valid @RequestBody GameRequest req) {
         return gameService.create(authentication.getName(), req);
