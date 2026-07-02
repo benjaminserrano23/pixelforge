@@ -22,3 +22,8 @@ Thumbs.db
 
 # Archivos de trabajo locales (no van al remoto)
 PixelForge_Slice_Spec_1.md
+
+# artefactos de build del frontend (tsc -b)
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
