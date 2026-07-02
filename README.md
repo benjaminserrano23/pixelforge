@@ -12,8 +12,8 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 |------|-------------|--------|
 | 1 | Scaffold monorepo + `docker-compose` + endpoint `/api/health` | ✅ verificado 2026-06-10 |
 | 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ✅ implementado 2026-06-10 (15 tests verde) |
-| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ⏳ siguiente |
-| 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | — |
+| 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ✅ implementado 2026-07-02 (E2E manual verde) |
+| 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ⏳ siguiente |
 | 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | — |
 | 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | — |
 | 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | — |
@@ -38,12 +38,19 @@ pixelforge/
 │   ├── package.json, vite.config.ts, tsconfig.json
 │   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
 │   ├── index.html
-│   └── src/                              # main.tsx, App.tsx, index.css
+│   └── src/
+│       ├── main.tsx                      # árbol de rutas (React Router)
+│       ├── types.ts                      # DTOs espejo del backend
+│       ├── api/                          # client.ts (fetch + JWT), auth.ts
+│       ├── context/                      # AuthContext (sesión, login/register/logout)
+│       ├── components/                   # Layout, ProtectedRoute, FormField
+│       └── pages/                        # Home, Login, Register, Health, placeholders
 ├── docs/                                 # documentación interna
 │   ├── 01-architecture.md                # decisiones del Paso 1
 │   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
 │   ├── 03-workflow.md                    # ramas, verificación, deploy
-│   └── 04-auth.md                        # decisiones del Paso 2
+│   ├── 04-auth.md                        # decisiones del Paso 2
+│   └── 05-frontend-auth.md               # decisiones del Paso 3
 ├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```
