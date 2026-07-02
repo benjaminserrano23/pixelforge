@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ApiError } from '../api/client'
 import { fetchGame } from '../api/games'
+import { purchaseGame } from '../api/purchases'
+import { useAuth } from '../context/AuthContext'
 import type { Game } from '../types'
 
 export default function GameDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [state, setState] = useState<{ kind: 'loading' } | { kind: 'ok'; game: Game } | { kind: 'not_found' } | { kind: 'error' }>({
     kind: 'loading',
   })
@@ -62,16 +65,65 @@ export default function GameDetailPage() {
           <p className="text-xl text-indigo-400 mt-2">${game.price.toFixed(2)}</p>
           <p className="text-slate-300 mt-4 whitespace-pre-line">{game.description}</p>
 
-          {/* Adquirir un juego (biblioteca) llega en el Paso 6 del roadmap. */}
-          <button
-            disabled
-            title="Disponible en el Paso 6 del roadmap"
-            className="mt-6 w-full rounded-lg bg-slate-800 text-slate-500 py-2 text-sm font-medium cursor-not-allowed"
-          >
-            Adquirir (próximamente)
-          </button>
+          <PurchaseSection gameId={game.id} isPlayer={user?.role === 'PLAYER'} isLoggedIn={user !== null} />
         </div>
       </div>
+    </div>
+  )
+}
+
+function PurchaseSection({ gameId, isPlayer, isLoggedIn }: { gameId: number; isPlayer: boolean; isLoggedIn: boolean }) {
+  const [status, setStatus] = useState<'idle' | 'buying' | 'owned' | 'error'>('idle')
+
+  if (!isLoggedIn) {
+    return (
+      <p className="mt-6 text-sm text-slate-400">
+        <Link to="/login" className="text-indigo-400 hover:underline">
+          Inicia sesión
+        </Link>{' '}
+        como jugador para adquirir este juego.
+      </p>
+    )
+  }
+
+  if (!isPlayer) {
+    return <p className="mt-6 text-sm text-slate-500">Los desarrolladores no pueden adquirir juegos.</p>
+  }
+
+  if (status === 'owned') {
+    return (
+      <p className="mt-6 text-sm text-emerald-400">
+        Ya está en tu{' '}
+        <Link to="/library" className="underline">
+          biblioteca
+        </Link>
+        .
+      </p>
+    )
+  }
+
+  async function handlePurchase() {
+    setStatus('buying')
+    try {
+      await purchaseGame(gameId)
+      setStatus('owned')
+    } catch (err) {
+      // 409 already_purchased: el jugador ya lo tenía, no es un error real.
+      if (err instanceof ApiError && err.status === 409) setStatus('owned')
+      else setStatus('error')
+    }
+  }
+
+  return (
+    <div className="mt-6">
+      <button
+        onClick={handlePurchase}
+        disabled={status === 'buying'}
+        className="w-full rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 py-2 text-sm font-medium transition-colors"
+      >
+        {status === 'buying' ? 'Adquiriendo…' : 'Adquirir'}
+      </button>
+      {status === 'error' && <p className="mt-2 text-sm text-red-400">No se pudo completar la adquisición.</p>}
     </div>
   )
 }

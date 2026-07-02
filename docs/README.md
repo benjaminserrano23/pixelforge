@@ -22,10 +22,12 @@ y la operación día a día. El roadmap a alto nivel vive en el
 - **Paso 5 — Frontend de juegos: catálogo, detalle, mis juegos**
   - [07-games-frontend.md](07-games-frontend.md) — catálogo con filtros, formulario compartido crear/editar, subida de portada, y el bug real de la verificación E2E (editar un DRAFT daba 404 por reusar el endpoint público).
 
+- **Paso 6 — Adquisiciones, biblioteca y estadísticas**
+  - [08-purchases-stats.md](08-purchases-stats.md) — entidad Purchase con snapshot de precio, proyección de stats por interfaz, dashboard con Recharts cargado de forma lazy, y verificación E2E con curl y en navegador.
+
 - **Transversal**
   - [03-workflow.md](03-workflow.md) — estrategia de ramas (main/develop/feature), verificación pre-producción y deploy con Vercel/Render.
 
 ## Por venir (a medida que avancemos)
 
-- Paso 6 — Adquisiciones, biblioteca y stats.
 - Paso 7 — Pulido, diagramas (ER, clases, despliegue) y deploy.

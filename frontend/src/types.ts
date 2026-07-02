@@ -50,3 +50,28 @@ export type Page<T> = {
   totalItems: number
   totalPages: number
 }
+
+// Respuesta de POST /api/games/{id}/purchase y de cada item de GET /api/library.
+export type Purchase = {
+  id: number
+  game: Game
+  amount: number
+  createdAt: string
+}
+
+// Una fila del gráfico de stats (un juego del desarrollador).
+export type GameStatsEntry = {
+  gameId: number
+  title: string
+  purchases: number
+  revenue: number
+}
+
+// Respuesta de GET /api/stats/overview.
+export type StatsOverview = {
+  totalGames: number
+  publishedGames: number
+  totalPurchases: number
+  totalRevenue: number
+  perGame: GameStatsEntry[]
+}

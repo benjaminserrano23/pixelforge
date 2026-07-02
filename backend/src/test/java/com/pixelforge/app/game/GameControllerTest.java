@@ -8,6 +8,9 @@ import com.pixelforge.app.game.dto.GameResponse;
 import com.pixelforge.app.game.dto.PageResponse;
 import com.pixelforge.app.game.exception.GameNotFoundException;
 import com.pixelforge.app.game.exception.NotGameOwnerException;
+import com.pixelforge.app.purchase.PurchaseService;
+import com.pixelforge.app.purchase.dto.PurchaseResponse;
+import com.pixelforge.app.purchase.exception.AlreadyPurchasedException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +55,14 @@ class GameControllerTest {
     @Autowired ObjectMapper objectMapper;
 
     @MockBean GameService gameService;
+    @MockBean PurchaseService purchaseService;
     // Necesario porque @WebMvcTest escanea JwtAuthenticationFilter (Filter), que depende de JwtService.
     @MockBean JwtService jwtService;
 
     private static final org.springframework.security.core.Authentication DEVELOPER_AUTH =
             new UsernamePasswordAuthenticationToken("dev@example.com", null, List.of());
+    private static final org.springframework.security.core.Authentication PLAYER_AUTH =
+            new UsernamePasswordAuthenticationToken("player@example.com", null, List.of());
 
     @Test
     void catalog_returns_published_games() throws Exception {
@@ -145,6 +151,29 @@ class GameControllerTest {
                         .principal(DEVELOPER_AUTH))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("DRAFT"));
+    }
+
+    @Test
+    void purchase_returns_purchase_response() throws Exception {
+        var purchaseResponse = new PurchaseResponse(100L, sampleResponse(), new BigDecimal("9.99"),
+                Instant.parse("2026-07-02T00:00:00Z"));
+        when(purchaseService.purchase("player@example.com", 10L)).thenReturn(purchaseResponse);
+
+        mockMvc.perform(post("/api/games/10/purchase")
+                        .principal(PLAYER_AUTH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.game.title").value("Cave Story"));
+    }
+
+    @Test
+    void purchase_returns_409_when_already_purchased() throws Exception {
+        when(purchaseService.purchase("player@example.com", 10L))
+                .thenThrow(new AlreadyPurchasedException(10L));
+
+        mockMvc.perform(post("/api/games/10/purchase")
+                        .principal(PLAYER_AUTH))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").value("already_purchased"));
     }
 
     private GameResponse sampleResponse() {
