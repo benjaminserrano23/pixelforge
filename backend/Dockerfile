@@ -17,7 +17,13 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Usuario no-root: práctica estándar de seguridad para procesos en contenedor.
-RUN useradd --system --uid 1001 spring
+# El volumen de uploads se crea aquí (con dueño "spring") antes de montarlo:
+# Docker copia el contenido y los permisos de este directorio al volumen
+# nombrado la primera vez que se monta si está vacío; si se creara después
+# de USER spring, el volumen quedaría de root y la app no podría escribir.
+RUN useradd --system --uid 1001 spring \
+    && mkdir -p /uploads \
+    && chown spring:spring /uploads
 USER spring
 
 COPY --from=build /workspace/target/*.jar app.jar

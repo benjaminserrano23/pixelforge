@@ -45,8 +45,12 @@ services:
       # Para dev usamos un secreto fijo; en prod inyectar desde el panel del proveedor.
       JWT_SECRET: dev-only-secret-change-me-in-production-please-pixelforge
       JWT_EXPIRATION_MS: 900000
+      PIXELFORGE_UPLOADS_DIR: /uploads
     ports:
       - "8080:8080"
+    volumes:
+      # Persiste las portadas subidas fuera del contenedor (se pierden si no).
+      - uploads-data:/uploads
 
   frontend:
     build:
@@ -62,3 +66,4 @@ services:
 
 volumes:
   db-data:
+  uploads-data:

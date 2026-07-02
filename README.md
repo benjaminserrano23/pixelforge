@@ -13,8 +13,8 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 | 1 | Scaffold monorepo + `docker-compose` + endpoint `/api/health` | ✅ verificado 2026-06-10 |
 | 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ✅ implementado 2026-06-10 (15 tests verde) |
 | 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ✅ implementado 2026-07-02 (E2E manual verde) |
-| 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ⏳ siguiente |
-| 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | — |
+| 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ✅ implementado 2026-07-02 (32 tests verde, E2E manual contra Postgres) |
+| 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | ⏳ siguiente |
 | 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | — |
 | 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | — |
 
@@ -29,11 +29,12 @@ pixelforge/
 │       ├── main/java/com/pixelforge/app/
 │       │   ├── PixelforgeApplication.java
 │       │   ├── auth/                     # AuthController, AuthService, dto/, jwt/, exception/
-│       │   ├── config/                   # SecurityConfig (filtro JWT integrado)
+│       │   ├── config/                   # SecurityConfig, WebConfig (recursos estáticos /uploads)
+│       │   ├── game/                     # Game entity, GameController/Service/Repository, dto/, exception/, CoverStorageService
 │       │   ├── health/                   # HealthController (/api/health)
 │       │   └── user/                     # User entity, UserRole, UserRepository
 │       ├── main/resources/application.properties
-│       └── test/java/com/pixelforge/app/ # AuthServiceTest, AuthControllerTest, UserRepositoryTest
+│       └── test/java/com/pixelforge/app/ # AuthServiceTest, AuthControllerTest, GameServiceTest, GameControllerTest, UserRepositoryTest
 ├── frontend/                             # React 19 + Vite + TS + Tailwind v4
 │   ├── package.json, vite.config.ts, tsconfig.json
 │   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
@@ -50,7 +51,8 @@ pixelforge/
 │   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
 │   ├── 03-workflow.md                    # ramas, verificación, deploy
 │   ├── 04-auth.md                        # decisiones del Paso 2
-│   └── 05-frontend-auth.md               # decisiones del Paso 3
+│   ├── 05-frontend-auth.md               # decisiones del Paso 3
+│   └── 06-games-crud.md                  # decisiones del Paso 4
 ├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```
