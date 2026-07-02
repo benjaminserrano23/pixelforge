@@ -48,6 +48,15 @@ public class GameService {
         return PageResponse.from(gameRepository.findByDeveloperId(developer.getId(), pageable), GameResponse::from);
     }
 
+    // A diferencia de findPublishedById (catálogo público, solo PUBLISHED),
+    // esta variante es para que el propio desarrollador vea/edite su juego
+    // sin importar el status: el formulario de edición del frontend la usa
+    // porque un juego recién creado es DRAFT y findPublishedById le daría 404.
+    @Transactional(readOnly = true)
+    public GameResponse findOwned(String developerEmail, Long id) {
+        return GameResponse.from(requireOwnedGame(developerEmail, id));
+    }
+
     @Transactional
     public GameResponse create(String developerEmail, GameRequest req) {
         User developer = requireUser(developerEmail);

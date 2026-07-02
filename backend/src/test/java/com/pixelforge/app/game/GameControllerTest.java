@@ -137,6 +137,16 @@ class GameControllerTest {
                 .andExpect(jsonPath("$.items[0].title").value("Cave Story"));
     }
 
+    @Test
+    void mineDetail_returns_draft_game_for_its_owner() throws Exception {
+        when(gameService.findOwned("dev@example.com", 10L)).thenReturn(sampleResponse());
+
+        mockMvc.perform(get("/api/games/mine/10")
+                        .principal(DEVELOPER_AUTH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("DRAFT"));
+    }
+
     private GameResponse sampleResponse() {
         return new GameResponse(10L, "Cave Story", "Metroidvania", "Platformer", new BigDecimal("9.99"),
                 null, GameStatus.DRAFT, 1L, Instant.parse("2026-07-02T00:00:00Z"), Instant.parse("2026-07-02T00:00:00Z"));

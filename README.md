@@ -14,8 +14,8 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 | 2 | Backend auth: User + register/login + JWT + Spring Security con roles | ✅ implementado 2026-06-10 (15 tests verde) |
 | 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ✅ implementado 2026-07-02 (E2E manual verde) |
 | 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ✅ implementado 2026-07-02 (32 tests verde, E2E manual contra Postgres) |
-| 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | ⏳ siguiente |
-| 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | — |
+| 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | ✅ implementado 2026-07-02 (35 tests backend verde, E2E manual en navegador) |
+| 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | ⏳ siguiente |
 | 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | — |
 
 ## Estructura
@@ -42,17 +42,19 @@ pixelforge/
 │   └── src/
 │       ├── main.tsx                      # árbol de rutas (React Router)
 │       ├── types.ts                      # DTOs espejo del backend
-│       ├── api/                          # client.ts (fetch + JWT), auth.ts
+│       ├── api/                          # client.ts (fetch + JWT + upload), auth.ts, games.ts
 │       ├── context/                      # AuthContext (sesión, login/register/logout)
-│       ├── components/                   # Layout, ProtectedRoute, FormField
-│       └── pages/                        # Home, Login, Register, Health, placeholders
+│       ├── components/                   # Layout, ProtectedRoute, FormField, GameCard
+│       └── pages/                        # Home (catálogo), GameDetail, Login, Register, Health
+│           └── dev/                      # MyGamesPage, GameFormPage (crear/editar + portada)
 ├── docs/                                 # documentación interna
 │   ├── 01-architecture.md                # decisiones del Paso 1
 │   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
 │   ├── 03-workflow.md                    # ramas, verificación, deploy
 │   ├── 04-auth.md                        # decisiones del Paso 2
 │   ├── 05-frontend-auth.md               # decisiones del Paso 3
-│   └── 06-games-crud.md                  # decisiones del Paso 4
+│   ├── 06-games-crud.md                  # decisiones del Paso 4
+│   └── 07-games-frontend.md              # decisiones del Paso 5
 ├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```

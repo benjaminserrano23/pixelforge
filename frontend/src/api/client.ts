@@ -31,6 +31,26 @@ export class ApiError extends Error {
   }
 }
 
+async function handleResponse<T>(res: Response, hadToken: boolean): Promise<T> {
+  if (!res.ok) {
+    // 401 con token guardado = token expirado o inválido: lo limpiamos para
+    // que el AuthContext no siga intentando restaurar una sesión muerta.
+    if (res.status === 401 && hadToken) clearToken()
+
+    let body: ApiErrorBody | null = null
+    try {
+      body = await res.json()
+    } catch {
+      // Respuesta sin cuerpo JSON (p. ej. 500 del proxy): se conserva solo el status.
+    }
+    throw new ApiError(res.status, body)
+  }
+
+  // 204 u otras respuestas sin cuerpo.
+  if (res.status === 204) return undefined as T
+  return res.json() as Promise<T>
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: unknown
@@ -52,21 +72,17 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
   })
 
-  if (!res.ok) {
-    // 401 con token guardado = token expirado o inválido: lo limpiamos para
-    // que el AuthContext no siga intentando restaurar una sesión muerta.
-    if (res.status === 401 && token) clearToken()
+  return handleResponse<T>(res, token !== null)
+}
 
-    let body: ApiErrorBody | null = null
-    try {
-      body = await res.json()
-    } catch {
-      // Respuesta sin cuerpo JSON (p. ej. 500 del proxy): se conserva solo el status.
-    }
-    throw new ApiError(res.status, body)
-  }
+// Subida de archivos: el navegador debe fijar Content-Type con el boundary
+// del multipart, así que a diferencia de api() nunca lo seteamos a mano.
+export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
+  const headers: Record<string, string> = {}
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
 
-  // 204 u otras respuestas sin cuerpo.
-  if (res.status === 204) return undefined as T
-  return res.json() as Promise<T>
+  const res = await fetch(path, { method: 'POST', headers, body: formData })
+
+  return handleResponse<T>(res, token !== null)
 }

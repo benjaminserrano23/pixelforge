@@ -55,9 +55,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
-                        // Orden importa: "/mine" es más específico que el comodín "/*" de
-                        // abajo y debe evaluarse antes, o quedaría público por error.
-                        .requestMatchers(HttpMethod.GET, "/api/games/mine").authenticated()
+                        // Orden importa: "/mine" y "/mine/{id}" son más específicos que
+                        // el comodín "/*" de abajo y deben evaluarse antes, o quedarían
+                        // públicos por error.
+                        .requestMatchers(HttpMethod.GET, "/api/games/mine", "/api/games/mine/*").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/games", "/api/games/*").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/games").hasRole("DEVELOPER")
                         .requestMatchers(HttpMethod.PUT, "/api/games/*").hasRole("DEVELOPER")
