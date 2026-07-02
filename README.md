@@ -16,7 +16,7 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 | 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ✅ implementado 2026-07-02 (32 tests verde, E2E manual contra Postgres) |
 | 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | ✅ implementado 2026-07-02 (35 tests backend verde, E2E manual en navegador) |
 | 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | ✅ implementado 2026-07-02 (44 tests backend verde, E2E manual en navegador) |
-| 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | ⏳ siguiente |
+| 7 | Pulido: tests frontend, CI, diagramas y guía de deploy | ✅ implementado 2026-07-02 (29 tests frontend + 44 backend, CI en GitHub Actions); **deploy pendiente** — guía lista en [`docs/10-deploy-guide.md`](docs/10-deploy-guide.md), requiere cuentas propias en Vercel/Render |
 
 ## Estructura
 
@@ -40,12 +40,14 @@ pixelforge/
 │   ├── package.json, vite.config.ts, tsconfig.json
 │   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
 │   ├── index.html
+│   ├── vercel.json                       # rewrites /api y /uploads hacia el backend en producción
 │   └── src/
 │       ├── main.tsx                      # árbol de rutas (React Router)
 │       ├── types.ts                      # DTOs espejo del backend
 │       ├── api/                          # client.ts (fetch + JWT + upload), auth.ts, games.ts, purchases.ts
 │       ├── context/                      # AuthContext (sesión, login/register/logout)
-│       ├── components/                   # Layout, ProtectedRoute, FormField, GameCard
+│       ├── components/                   # Layout, ProtectedRoute, FormField, GameCard (+ *.test.tsx)
+│       ├── test/setup.ts                 # setup de Vitest (jest-dom)
 │       └── pages/                        # Home (catálogo), GameDetail (+ compra), Library, Login, Register, Health
 │           └── dev/                      # MyGamesPage, GameFormPage, StatsPage (Recharts, lazy-loaded)
 ├── docs/                                 # documentación interna
@@ -56,7 +58,10 @@ pixelforge/
 │   ├── 05-frontend-auth.md               # decisiones del Paso 3
 │   ├── 06-games-crud.md                  # decisiones del Paso 4
 │   ├── 07-games-frontend.md              # decisiones del Paso 5
-│   └── 08-purchases-stats.md             # decisiones del Paso 6
+│   ├── 08-purchases-stats.md             # decisiones del Paso 6
+│   ├── 09-diagrams.md                    # diagrama ER, paquetes del backend, despliegue (Mermaid)
+│   └── 10-deploy-guide.md                # guía paso a paso: Vercel + Render/Railway + Postgres
+├── .github/workflows/ci.yml              # tests + build de backend y frontend en cada push/PR
 ├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```
@@ -73,6 +78,26 @@ docker compose up --build
 - Frontend: <http://localhost:5173>
 - Backend:  <http://localhost:8080/api/health>
 - Postgres: `localhost:5432` (usuario `pixelforge`, password `pixelforge`, db `pixelforge`)
+
+## Tests
+
+```bash
+# Backend (JUnit + Mockito + MockMvc): 44 tests
+cd backend && mvn test
+
+# Frontend (Vitest + Testing Library): 29 tests
+cd frontend && npm run test
+```
+
+Ambos corren automáticamente en cada push/PR vía
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+## Diagramas y deploy
+
+- Diagrama ER, mapa de paquetes del backend y diagrama de despliegue:
+  [`docs/09-diagrams.md`](docs/09-diagrams.md).
+- Guía paso a paso para desplegar en Vercel + Render/Railway + Postgres
+  administrado: [`docs/10-deploy-guide.md`](docs/10-deploy-guide.md).
 
 ## Decisiones arquitectónicas
 

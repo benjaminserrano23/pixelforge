@@ -25,9 +25,9 @@ y la operación día a día. El roadmap a alto nivel vive en el
 - **Paso 6 — Adquisiciones, biblioteca y estadísticas**
   - [08-purchases-stats.md](08-purchases-stats.md) — entidad Purchase con snapshot de precio, proyección de stats por interfaz, dashboard con Recharts cargado de forma lazy, y verificación E2E con curl y en navegador.
 
+- **Paso 7 — Pulido: tests de frontend, CI, diagramas y deploy**
+  - [09-diagrams.md](09-diagrams.md) — diagrama ER, mapa de paquetes del backend y diagrama de despliegue (Mermaid).
+  - [10-deploy-guide.md](10-deploy-guide.md) — guía paso a paso para desplegar en Vercel (frontend) + Render/Railway (backend) + Postgres administrado.
+
 - **Transversal**
   - [03-workflow.md](03-workflow.md) — estrategia de ramas (main/develop/feature), verificación pre-producción y deploy con Vercel/Render.
-
-## Por venir (a medida que avancemos)
-
-- Paso 7 — Pulido, diagramas (ER, clases, despliegue) y deploy.
