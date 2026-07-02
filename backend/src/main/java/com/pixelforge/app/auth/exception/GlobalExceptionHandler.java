@@ -1,11 +1,16 @@
 package com.pixelforge.app.auth.exception;
 
+import com.pixelforge.app.game.CoverStorageService;
+import com.pixelforge.app.game.exception.GameNotFoundException;
+import com.pixelforge.app.game.exception.NotGameOwnerException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -40,5 +45,29 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleEmailUsed(EmailAlreadyUsedException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "email_already_used"));
+    }
+
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleGameNotFound(GameNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "game_not_found"));
+    }
+
+    @ExceptionHandler(NotGameOwnerException.class)
+    public ResponseEntity<Map<String, String>> handleNotGameOwner(NotGameOwnerException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "not_game_owner"));
+    }
+
+    @ExceptionHandler(CoverStorageService.InvalidCoverException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCover(CoverStorageService.InvalidCoverException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "invalid_cover", "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "invalid_cover", "message", "la imagen supera el máximo permitido"));
     }
 }

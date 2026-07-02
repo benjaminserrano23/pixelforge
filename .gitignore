@@ -3,6 +3,7 @@ backend/target/
 backend/.mvn/
 backend/.idea/
 backend/*.iml
+backend/uploads/
 
 # Frontend (Node)
 frontend/node_modules/

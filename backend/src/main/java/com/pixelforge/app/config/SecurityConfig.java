@@ -1,5 +1,6 @@
 package com.pixelforge.app.config;
 
+import com.pixelforge.app.auth.jwt.JwtAccessDeniedHandler;
 import com.pixelforge.app.auth.jwt.JwtAuthenticationEntryPoint;
 import com.pixelforge.app.auth.jwt.JwtAuthenticationFilter;
 
@@ -20,11 +21,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
     /**
@@ -41,12 +45,24 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 401 con body JSON en vez del 403 por defecto cuando falta auth.
-                .exceptionHandling(eh -> eh.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                // 401 con body JSON cuando falta auth; 403 explícito (con el mismo
+                // formato) cuando el usuario está autenticado pero le falta el rol.
+                .exceptionHandling(eh -> eh
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas:
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        // Orden importa: "/mine" es más específico que el comodín "/*" de
+                        // abajo y debe evaluarse antes, o quedaría público por error.
+                        .requestMatchers(HttpMethod.GET, "/api/games/mine").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/games", "/api/games/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/games").hasRole("DEVELOPER")
+                        .requestMatchers(HttpMethod.PUT, "/api/games/*").hasRole("DEVELOPER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/games/*").hasRole("DEVELOPER")
+                        .requestMatchers(HttpMethod.POST, "/api/games/*/cover").hasRole("DEVELOPER")
                         // Resto de /api/** requiere JWT válido.
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
