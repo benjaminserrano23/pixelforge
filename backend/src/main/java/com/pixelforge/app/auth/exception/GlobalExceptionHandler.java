@@ -3,6 +3,7 @@ package com.pixelforge.app.auth.exception;
 import com.pixelforge.app.game.CoverStorageService;
 import com.pixelforge.app.game.exception.GameNotFoundException;
 import com.pixelforge.app.game.exception.NotGameOwnerException;
+import com.pixelforge.app.purchase.exception.AlreadyPurchasedException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,5 +70,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "invalid_cover", "message", "la imagen supera el máximo permitido"));
+    }
+
+    @ExceptionHandler(AlreadyPurchasedException.class)
+    public ResponseEntity<Map<String, String>> handleAlreadyPurchased(AlreadyPurchasedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "already_purchased"));
     }
 }

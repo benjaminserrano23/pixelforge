@@ -10,6 +10,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     Page<Game> findByDeveloperId(Long developerId, Pageable pageable);
 
+    long countByDeveloperId(Long developerId);
+
+    long countByDeveloperIdAndStatus(Long developerId, GameStatus status);
+
     // Catálogo público: solo PUBLISHED, con filtros opcionales por género y
     // búsqueda de texto en el título. Los parámetros nulos se ignoran (JPQL
     // corto-circuita la condición cuando ?1/?2 es null) en vez de armar la

@@ -3,6 +3,8 @@ package com.pixelforge.app.game;
 import com.pixelforge.app.game.dto.GameRequest;
 import com.pixelforge.app.game.dto.GameResponse;
 import com.pixelforge.app.game.dto.PageResponse;
+import com.pixelforge.app.purchase.PurchaseService;
+import com.pixelforge.app.purchase.dto.PurchaseResponse;
 
 import jakarta.validation.Valid;
 
@@ -25,9 +27,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class GameController {
 
     private final GameService gameService;
+    private final PurchaseService purchaseService;
 
-    public GameController(GameService gameService) {
+    public GameController(GameService gameService, PurchaseService purchaseService) {
         this.gameService = gameService;
+        this.purchaseService = purchaseService;
     }
 
     // Catálogo público — sin auth (ver SecurityConfig). "mine" no puede vivir
@@ -77,5 +81,11 @@ public class GameController {
     public GameResponse uploadCover(Authentication authentication, @PathVariable Long id,
                                     @RequestPart("file") MultipartFile file) {
         return gameService.uploadCover(authentication.getName(), id, file);
+    }
+
+    // Jugador (rol PLAYER, ver SecurityConfig): "adquirir" un juego publicado.
+    @PostMapping("/{id}/purchase")
+    public PurchaseResponse purchase(Authentication authentication, @PathVariable Long id) {
+        return purchaseService.purchase(authentication.getName(), id);
     }
 }

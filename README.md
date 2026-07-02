@@ -15,8 +15,8 @@ para portafolio, inspirado en el proyecto universitario UFRO GameLab.
 | 3 | Frontend auth: login/register + AuthContext + rutas protegidas | ✅ implementado 2026-07-02 (E2E manual verde) |
 | 4 | Backend juegos: entidad Game + CRUD + ownership + upload imagen | ✅ implementado 2026-07-02 (32 tests verde, E2E manual contra Postgres) |
 | 5 | Frontend juegos: catálogo, detalle, mis juegos, form crear/editar | ✅ implementado 2026-07-02 (35 tests backend verde, E2E manual en navegador) |
-| 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | ⏳ siguiente |
-| 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | — |
+| 6 | Adquisiciones + biblioteca + endpoint stats + dashboard con gráfico | ✅ implementado 2026-07-02 (44 tests backend verde, E2E manual en navegador) |
+| 7 | Pulido, diagramas (ER/clases/despliegue), tests, deploy | ⏳ siguiente |
 
 ## Estructura
 
@@ -32,9 +32,10 @@ pixelforge/
 │       │   ├── config/                   # SecurityConfig, WebConfig (recursos estáticos /uploads)
 │       │   ├── game/                     # Game entity, GameController/Service/Repository, dto/, exception/, CoverStorageService
 │       │   ├── health/                   # HealthController (/api/health)
+│       │   ├── purchase/                 # Purchase entity, PurchaseService, LibraryController, StatsController, dto/, exception/
 │       │   └── user/                     # User entity, UserRole, UserRepository
 │       ├── main/resources/application.properties
-│       └── test/java/com/pixelforge/app/ # AuthServiceTest, AuthControllerTest, GameServiceTest, GameControllerTest, UserRepositoryTest
+│       └── test/java/com/pixelforge/app/ # tests de auth, game y purchase (44 en total)
 ├── frontend/                             # React 19 + Vite + TS + Tailwind v4
 │   ├── package.json, vite.config.ts, tsconfig.json
 │   ├── nginx.conf, Dockerfile            # multi-stage: node build -> nginx runtime
@@ -42,11 +43,11 @@ pixelforge/
 │   └── src/
 │       ├── main.tsx                      # árbol de rutas (React Router)
 │       ├── types.ts                      # DTOs espejo del backend
-│       ├── api/                          # client.ts (fetch + JWT + upload), auth.ts, games.ts
+│       ├── api/                          # client.ts (fetch + JWT + upload), auth.ts, games.ts, purchases.ts
 │       ├── context/                      # AuthContext (sesión, login/register/logout)
 │       ├── components/                   # Layout, ProtectedRoute, FormField, GameCard
-│       └── pages/                        # Home (catálogo), GameDetail, Login, Register, Health
-│           └── dev/                      # MyGamesPage, GameFormPage (crear/editar + portada)
+│       └── pages/                        # Home (catálogo), GameDetail (+ compra), Library, Login, Register, Health
+│           └── dev/                      # MyGamesPage, GameFormPage, StatsPage (Recharts, lazy-loaded)
 ├── docs/                                 # documentación interna
 │   ├── 01-architecture.md                # decisiones del Paso 1
 │   ├── 02-run-guide.md                   # cómo arrancar el monorepo (Windows)
@@ -54,7 +55,8 @@ pixelforge/
 │   ├── 04-auth.md                        # decisiones del Paso 2
 │   ├── 05-frontend-auth.md               # decisiones del Paso 3
 │   ├── 06-games-crud.md                  # decisiones del Paso 4
-│   └── 07-games-frontend.md              # decisiones del Paso 5
+│   ├── 07-games-frontend.md              # decisiones del Paso 5
+│   └── 08-purchases-stats.md             # decisiones del Paso 6
 ├── docker-compose.yml                    # db + backend + frontend
 └── README.md
 ```

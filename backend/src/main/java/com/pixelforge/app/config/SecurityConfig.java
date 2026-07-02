@@ -64,6 +64,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/games/*").hasRole("DEVELOPER")
                         .requestMatchers(HttpMethod.DELETE, "/api/games/*").hasRole("DEVELOPER")
                         .requestMatchers(HttpMethod.POST, "/api/games/*/cover").hasRole("DEVELOPER")
+                        .requestMatchers(HttpMethod.POST, "/api/games/*/purchase").hasRole("PLAYER")
+                        .requestMatchers(HttpMethod.GET, "/api/library").hasRole("PLAYER")
+                        .requestMatchers(HttpMethod.GET, "/api/stats/overview").hasRole("DEVELOPER")
                         // Resto de /api/** requiere JWT válido.
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
